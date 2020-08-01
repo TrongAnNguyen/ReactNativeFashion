@@ -1,8 +1,15 @@
 import React, {useState, useRef} from 'react';
-import {View, StyleSheet, Dimensions, Animated, TextInput} from 'react-native';
+import {View, StyleSheet, Dimensions} from 'react-native';
+import Animated, {
+  interpolateColors,
+  divide,
+  multiply,
+  Value,
+} from 'react-native-reanimated';
 
 import Slide, {SLIDE_HEIGHT} from './Slide';
 import Subslide from './Subslide';
+import Dot from './../../component';
 
 const {width} = Dimensions.get('window');
 const BORDER_RADIUS = 75;
@@ -22,7 +29,15 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     backgroundColor: 'white',
+  },
+  pagination: {
+    width,
+    flexDirection: 'row',
+    height: BORDER_RADIUS,
     borderTopLeftRadius: BORDER_RADIUS,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
 });
 const slides = [
@@ -57,11 +72,11 @@ const slides = [
 ];
 
 const Onboarding = () => {
-  const [x] = useState(new Animated.Value(0));
+  const [x] = useState(new Value(0));
   const scrollRef = useRef<any>(null);
-  const backgroundColor = x.interpolate({
+  const backgroundColor = interpolateColors(x, {
     inputRange: slides.map((_, i) => i * width),
-    outputRange: slides.map((slide) => slide.color),
+    outputColorRange: slides.map((slide) => slide.color),
   });
   const onScrollEvent = Animated.event(
     [
@@ -97,12 +112,17 @@ const Onboarding = () => {
         <Animated.View
           style={{...StyleSheet.absoluteFillObject, backgroundColor}}
         />
+        <View style={styles.pagination}>
+          {slides.map((_, index) => (
+            <Dot key={index} index={index} currentIndex={divide(x, width)} />
+          ))}
+        </View>
         <Animated.View
           style={[
             styles.footerMain,
             {
               width: width * slides.length,
-              transform: [{translateX: Animated.multiply(x, -1)}],
+              transform: [{translateX: multiply(x, -1)}],
             },
           ]}>
           {slides.map(({subtitle, description}, idx) => (
@@ -113,7 +133,7 @@ const Onboarding = () => {
               last={idx === slides.length - 1}
               onPress={() => {
                 if (scrollRef.current) {
-                  scrollRef.current.scrollTo({
+                  scrollRef.current.getNode().scrollTo({
                     x: width * (idx + 1),
                     animated: true,
                   });

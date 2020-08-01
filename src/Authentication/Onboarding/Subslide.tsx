@@ -5,10 +5,9 @@ import {Button} from './../../component';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 35,
-    paddingVertical: 40,
+    paddingTop: 10
   },
   subtitle: {
     fontFamily: 'SF-Pro-Display-Semibold',
